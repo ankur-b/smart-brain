@@ -1,11 +1,44 @@
 import React, { Component } from "react";
 import "./Signin.css";
 export class Signin extends Component {
+  constructor(props){
+    super(props)
+    this.state = {
+      signInEmail:'',
+      signInPassword:''
+    }
+  }
+  onEmailChange = (event)=>{
+    this.setState({signInEmail:event.target.value})
+  }
+  onPasswordChange = (event)=>{
+    this.setState({signInPassword:event.target.value})
+  }
+  onSubmitSignin = async ()=>{
+    await fetch('http://localhost:3000/signin',{
+      method:'post',
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({
+        email:this.state.signInEmail,
+        password:this.state.signInPassword
+      })
+    })
+      .then(response => response.json())
+      .then(user => {
+        if(user.id){
+          this.props.loadUser(user)
+          console.log(user)
+          this.props.onRouteChange("home")
+        }
+      })
+  } 
   render() {
     return (
       <article className="br3 ba dark-gray b--black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center">
         <main className="pa4 black-80">
-          <form className="measure ">
+          <div className="measure ">
             <fieldset id="sign_up" className="ba b--transparent ph0 mh0">
               <legend className="f1 fw6 ph0 mh0">Sign In</legend>
               <div className="mt3">
@@ -13,6 +46,8 @@ export class Signin extends Component {
                   Email
                 </label>
                 <input
+                  onChange={this.onEmailChange}
+                  value={this.state.signInEmail}
                   className="pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
                   type="email"
                   name="email-address"
@@ -24,6 +59,8 @@ export class Signin extends Component {
                   Password
                 </label>
                 <input
+                  onChange={this.onPasswordChange}
+                  value={this.state.signInPassword}
                   className="b pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
                   type="password"
                   name="password"
@@ -33,7 +70,7 @@ export class Signin extends Component {
             </fieldset>
             <div className="">
               <input
-                onClick={()=>this.props.onRouteChange("home")}
+                onClick={this.onSubmitSignin}
                 className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib"
                 type="submit"
                 value="Sign in"
@@ -44,7 +81,7 @@ export class Signin extends Component {
                 Register
               </p>
             </div>
-          </form>
+          </div>
         </main>
       </article>
     );
